@@ -1,8 +1,12 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class NotificationService {
     List<Notifier> notificationVia = new ArrayList<>();
+    private final ExecutorService notifierPool = Executors.newCachedThreadPool();
+
     public NotificationService(List<Notifier> notificationVia) {
         this.notificationVia = notificationVia;
     }
@@ -17,7 +21,11 @@ public class NotificationService {
 
     public void sendNotifications(Oncall oncall) {
         for(Notifier n : notificationVia) {
-            n.sendNotification(oncall);
+            notifierPool.submit(()->n.sendNotification(oncall));
         }
+    }
+
+    public void shutDown() {
+        notifierPool.shutdown();
     }
 }

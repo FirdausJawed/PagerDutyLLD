@@ -32,6 +32,7 @@ public class PagerDuty {
     public void notifyOncall(Oncall oncall, Alert alert) {
         List<Notifier> notifyVia = new ArrayList<>();
         initializeNotifiers(notifyVia);
+        notificationService.setNotificationVia(notifyVia);
         notificationService.sendNotifications(oncall);
     }
 
@@ -53,9 +54,9 @@ public class PagerDuty {
         System.out.println("escalated the issue to secondary oncall and the manager");
     }
 
-    //if oncall has not ack the alert, call him again
+    //if oncall has not ack the alert, call him again after 10 min
     public void alarmOncall(Oncall oncall, Alert alert) {
-        if((alert.status == Status.NEW)
+        if((alert.getStatus() == Status.NEW)
             && (alert.creationTime-System.currentTimeMillis()) >= TimeUnit.MINUTES.toMillis(10)) {
             notifyOncall(oncall, alert);
         }
